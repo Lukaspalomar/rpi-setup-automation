@@ -1,0 +1,9 @@
+---
+- name: Update timedatectl settings
+  hosts: all
+  become: yes
+  tasks:
+    - name: Enable NTP
+      command: timedatectl set-ntp true
+    - name: Set the time zone
+      command: timedatectl set-timezone Europe/London

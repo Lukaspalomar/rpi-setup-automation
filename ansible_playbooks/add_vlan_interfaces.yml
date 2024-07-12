@@ -1,0 +1,13 @@
+---
+- name: Add VLAN tagged interfaces
+  hosts: all
+  become: yes
+  tasks:
+    - name: Create VLAN interfaces file
+      blockinfile:
+        path: /etc/network/interfaces.d/vlans
+        block: |
+          auto: eth1.900
+          iface eth1.900 inet manual
+            vlan-raw-device eth1
+        create: yes

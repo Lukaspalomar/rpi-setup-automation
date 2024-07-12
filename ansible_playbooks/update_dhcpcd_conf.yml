@@ -1,0 +1,17 @@
+---
+- name: Update dhcpcd.conf
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update interfaces in dhcpcd.conf
+      blockinfile:
+        path: /etc/dhcpcd.conf
+        block: |
+          interface eth0
+
+          interface eth1
+
+          interface eth1.900
+              static ip_address=10.4.0.143/23
+              # static routers=10.4.0.1
+        create: yes

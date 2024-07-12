@@ -1,0 +1,60 @@
+---
+- name: Setup Raspberry Pi
+  hosts: all
+  become: yes
+  tasks:
+    - name: Add InfluxData repository key
+      get_url:
+        url: https://repos.influxdata.com/influxdb.key
+        dest: /etc/apt/trusted.gpg.d/influxdb.asc
+
+    - name: Add InfluxData repository
+      blockinfile:
+        path: /etc/apt/sources.list.d/influxdb.list
+        block: |
+          deb https://repos.influxdata.com/debian {{ ansible_distribution_release }} stable
+        create: yes
+
+    - name: Download InfluxData Archive key
+      get_url:
+        url: https://repos.influxdata.com/influxdata-archive_compat.key
+        dest: /tmp/influxdata-archive_compat.key
+
+    - name: Convert InfluxData Archive Key to GPG format
+      shell: cat /tmp/influxdata-archive_compat.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg > /dev/null
+
+    - name: Add InfluxData Repository to sources list
+      lineinfile:
+        path: /etc/apt/sources.list.d/influxdata.list
+        line: 'deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main'
+        create: yes
+
+    - name: Remove old InfluxDB GPG key
+      become: yes
+      shell:
+        cmd: |
+          apt-key del influxdata-archive.gpg
+          apt-key del influxdata-archive_compat.gpg
+
+    - name: Add InfluxDB key using apt-key
+      shell: curl -sL https://repos.influxdata.com/influxdb.key | apt-key add -
+      register: apt_key_result
+      changed_when: "'OK' in apt_key_result.stdout"
+
+    - name: Update apt package index
+      apt:
+      ignore_errors: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - vim
+          - tcpdump
+          - telnet
+          - vlan
+          - rsync
+          - picocom
+          - tshark
+          - python3-pip
+          - autossh
+        state: present

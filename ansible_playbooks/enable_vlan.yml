@@ -1,0 +1,15 @@
+---
+- name: Enable VLAN Support
+  hosts: all
+  become: yes
+  tasks:
+    - name: Load 802.1Q module on boot
+      lineinfile:
+        path: /etc/modules
+        line: '8021q'
+        create: yes
+#    - name: Reboot the system
+#      ansible.builtin.reboot:
+#        reboot_timeout: 300
+#        connect_timeout: 30
+#        msg: "Reboot initiated by Ansible for VLAN configuration"

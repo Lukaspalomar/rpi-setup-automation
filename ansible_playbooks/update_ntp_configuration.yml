@@ -1,0 +1,19 @@
+---
+- name: Update NTP configuration
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update NTP servers in timesyncd.conf
+      lineinfile:
+        path: /etc/systemd/timesyncd.conf
+        regexp: '^NTP='
+        line: 'NTP=10.4.0.101 10.4.0.102'
+        state: present
+      notify:
+        - restart systemd-timesyncd
+
+  handlers:
+    - name: restart systemd-timesyncd
+      systemd:
+        name: systemd-timesyncd
+        state: restarted

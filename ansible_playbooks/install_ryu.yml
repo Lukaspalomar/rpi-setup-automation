@@ -1,0 +1,19 @@
+---
+- name: Install Ryu on rpi
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt package index
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install pip3
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install Ryu via pip3
+      ansible.builtin.pip:
+        name: ryu
+        executable: pip3
+        extra_args: --user
